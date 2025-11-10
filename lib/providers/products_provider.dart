@@ -1,30 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProductsProvider extends ChangeNotifier {
-  final CollectionReference productsCollection =
-      FirebaseFirestore.instance.collection('products');
+  List<Map<String, dynamic>> _products = [];
 
-  List<Map<String, dynamic>> products = [];
+  List<Map<String, dynamic>> get products => _products;
 
-  ProductsProvider() {
-    fetchProducts();
+  void addProduct(Map<String, dynamic> product) {
+    _products.add(product);
+    notifyListeners();
   }
 
-  void fetchProducts() {
-    productsCollection.snapshots().listen((snapshot) {
-      products = snapshot.docs
-          .map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>})
-          .toList();
+  void updateProduct(int index, Map<String, dynamic> product) {
+    if (index >= 0 && index < _products.length) {
+      _products[index] = product;
       notifyListeners();
-    });
+    }
   }
 
-  Future<void> addProduct(Map<String, dynamic> product) async {
-    await productsCollection.add(product);
-  }
-
-  Future<void> deleteProduct(String id) async {
-    await productsCollection.doc(id).delete();
+  void removeProduct(int index) {
+    if (index >= 0 && index < _products.length) {
+      _products.removeAt(index);
+      notifyListeners();
+    }
   }
 }

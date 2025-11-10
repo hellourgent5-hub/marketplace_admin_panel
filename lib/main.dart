@@ -1,20 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'providers/products_provider.dart';
 import 'providers/orders_provider.dart';
 import 'modules/home/admin_home.dart';
-import 'firebase_options.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   await dotenv.load(fileName: ".env");
-  runApp(AdminPanel());
+
+  await Firebase.initializeApp(
+    options: FirebaseOptions(
+      apiKey: dotenv.env['API_KEY']!,
+      authDomain: dotenv.env['AUTH_DOMAIN'],
+      projectId: dotenv.env['PROJECT_ID'],
+      storageBucket: dotenv.env['STORAGE_BUCKET'],
+      messagingSenderId: dotenv.env['MESSAGING_SENDER_ID'],
+      appId: dotenv.env['APP_ID'],
+    ),
+  );
+
+  runApp(AdminApp());
 }
 
-class AdminPanel extends StatelessWidget {
+class AdminApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -24,7 +36,8 @@ class AdminPanel extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Admin Panel',
-        theme: ThemeData(primarySwatch: Colors.orange),
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(primarySwatch: Colors.deepPurple),
         home: AdminHome(),
       ),
     );
